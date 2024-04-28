@@ -35,7 +35,7 @@ export default function Page() {
           />
         </div>
         <div className="flex justify-end">
-          <SubmitButton />
+          <SubmitButton>Submit</SubmitButton>
         </div>
       </form>
       {state.error && (
