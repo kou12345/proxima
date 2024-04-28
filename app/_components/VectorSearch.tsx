@@ -47,7 +47,7 @@ export const VectorSearch = () => {
           className="w-80 max-w-xs p-2 border border-gray-300 rounded mb-4"
           placeholder="Enter text here"
         />
-        <SubmitButton />
+        <SubmitButton>Search</SubmitButton>
       </form>
 
       {state.success ? (
