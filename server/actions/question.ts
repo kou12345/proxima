@@ -1,3 +1,5 @@
+"use server";
+
 import { VectorSearchResponseSchema } from "../type/zodSchema";
 
 export type State = {
