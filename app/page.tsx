@@ -1,5 +1,9 @@
-import { VectorSearch } from "./_components/VectorSearch";
+import { Chat } from "./_components/Chat";
 
 export default function Home() {
-  return <VectorSearch />;
+  return (
+    <div>
+      <Chat />
+    </div>
+  );
 }
