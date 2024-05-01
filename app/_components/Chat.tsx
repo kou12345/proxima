@@ -16,7 +16,8 @@ type CustomCodeProps = ClassAttributes<HTMLElement> &
 const CustomCode = ({ className, children }: CustomCodeProps) => {
   const match = /language-(\w+)/.exec(className || "");
 
-  if (!className && typeof children === "string") {
+  // インラインコードの表示
+  if (!className && typeof children === "string" && !children.includes("\n")) {
     return (
       <code className="bg-gray-800 text-white px-1 mx-1 rounded">
         {children}
@@ -25,10 +26,12 @@ const CustomCode = ({ className, children }: CustomCodeProps) => {
   }
 
   return match ? (
+    // 言語指定のあるcode block
     <SyntaxHighlighter style={atomDark} language={match[1]} PreTag="pre">
       {String(children).replace(/\n$/, "")}
     </SyntaxHighlighter>
   ) : (
+    // 言語指定なしのcode block
     <SyntaxHighlighter style={atomDark} PreTag="pre">
       {String(children).replace(/\n$/, "")}
     </SyntaxHighlighter>
