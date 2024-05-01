@@ -84,13 +84,20 @@ export const Chat = () => {
       </div>
       <form action={formAction} className="p-4 bg-gray-100">
         <div className="flex">
-          <input
-            type="text"
+          <textarea
             name="prompt"
-            className="flex-grow p-2 border border-gray-300 rounded-l"
+            className="flex-grow p-2 border border-gray-300 rounded-l max-h-80 resize-none"
             placeholder="Enter text here"
+            onChange={(e) => {
+              // これ入れないとサイズが変わったあとに内容を削除したときなど動きがおかしい
+              e.target.style.height = "auto";
+              // 改行に合わせて高さを変える
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
           />
-          <SubmitButton>Submit</SubmitButton>
+          <div className="flex flex-col justify-end ml-4">
+            <SubmitButton>Submit</SubmitButton>
+          </div>
         </div>
         {!state.success && (
           <div className="text-red-500 mt-2">{state.error}</div>
