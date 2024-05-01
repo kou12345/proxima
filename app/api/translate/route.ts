@@ -1,6 +1,14 @@
+import { createClient } from "@/utils/supabase/server";
 import { translation } from "../../../server/translation";
 
 export async function POST(request: Request) {
+  // 認証チェック
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const json = await request.json();
   console.log(json);
 
