@@ -6,6 +6,9 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ChatRequestSchema } from "@/server/type/zodSchema";
+import { useBoolean } from "../../hooks/useBoolean";
+import { CustomModal } from "./Modal";
+import { Button, FormControl, Input, Paper, Stack } from "@mui/material";
 
 type CustomCodeProps = ClassAttributes<HTMLElement> &
   HTMLAttributes<HTMLElement> &
@@ -37,10 +40,17 @@ const CustomCode = ({ className, children }: CustomCodeProps) => {
 };
 
 export const Chat = () => {
-  const [prompt, setPrompt] = useState("");
+  const [codeDescription, setCodeDescription] = useState("");
+  const [code, setCode] = useState("");
   const [isDisabled, setIsDisabled] = useState(false);
   const [history, setHistory] = useState<{ role: string; text: string }[]>([]);
   console.log(history);
+
+  const {
+    state: isModalOpen,
+    setToTrue: openModal,
+    setToFalse: closeModal,
+  } = useBoolean(false);
 
   const onSubmitChat = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +58,8 @@ export const Chat = () => {
     setIsDisabled(true);
 
     const validation = ChatRequestSchema.safeParse({
-      prompt: prompt,
+      codeDescription,
+      code,
     });
 
     if (!validation.success) {
@@ -73,11 +84,18 @@ export const Chat = () => {
 
     setHistory((prevHistory) => [
       ...prevHistory,
-      { role: "user", text: validation.data.prompt },
+      {
+        role: "user",
+        text:
+          validation.data.codeDescription +
+          "\n```\n" +
+          validation.data.code +
+          "\n```\n",
+      },
       { role: "model", text: json.response },
     ]);
 
-    setPrompt("");
+    setCode("");
     setIsDisabled(false);
   };
 
@@ -108,45 +126,53 @@ export const Chat = () => {
           </div>
         ))}
       </div>
-      <form onSubmit={onSubmitChat} className="p-4 bg-gray-100">
-        <div className="flex">
-          <textarea
-            name="prompt"
-            className="flex-grow p-2 border border-gray-300 rounded-l max-h-80 resize-none"
-            placeholder="Enter text here"
-            value={prompt}
-            onChange={(e) => {
-              // これ入れないとサイズが変わったあとに内容を削除したときなど動きがおかしい
-              e.target.style.height = "auto";
-              // 改行に合わせて高さを変える
-              e.target.style.height = e.target.scrollHeight + "px";
-
-              setPrompt(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-              }
-            }}
-          />
-          <div className="flex flex-col justify-end ml-4">
-            <button
-              type="submit"
-              className={`
-                w-24 h-10 text-white font-bold py-2 px-4 rounded
-                ${
-                  isDisabled
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-500 hover:bg-blue-700 cursor-pointer"
-                }
-              `}
-              disabled={isDisabled}
+      <form onSubmit={onSubmitChat} className="p-4">
+        <Stack spacing={2}>
+          <Paper elevation={1} sx={{ padding: "12px" }}>
+            <Stack>
+              <FormControl required>
+                <label htmlFor="codeDescription">コードの概要</label>
+                <Input
+                  name="codeDescription"
+                  defaultValue={codeDescription}
+                  aria-label="Input field for code description"
+                  multiline
+                  placeholder="例: このコードは〇〇を実現するためのコードです。"
+                />
+              </FormControl>
+            </Stack>
+            <Stack>
+              <FormControl required>
+                <label htmlFor="code">コード</label>
+                <Input
+                  name="code"
+                  defaultValue={code}
+                  aria-label="Input field for code"
+                  multiline
+                  placeholder="console.log('Hello, World!');"
+                />
+              </FormControl>
+            </Stack>
+            <Stack
+              direction="row"
+              justifyContent="flex-end"
+              alignItems="center"
+              spacing={2}
+              sx={{
+                marginTop: "12px",
+              }}
             >
-              Send
-            </button>
-          </div>
-        </div>
+              <Button variant="outlined" onClick={openModal}>
+                関連ファイルを追加する
+              </Button>
+              <Button type="submit" variant="contained" disabled={isDisabled}>
+                送信
+              </Button>
+            </Stack>
+          </Paper>
+        </Stack>
       </form>
+      <CustomModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 };
