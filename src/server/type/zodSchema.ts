@@ -21,3 +21,7 @@ export const ChatRequestSchema = z.object({
   codeDescription: z.string().min(1),
   code: z.string().min(1),
 });
+
+export const SupplementaryCodeFormSchema = z.object({
+  supplementaryCode: z.array(ChatRequestSchema),
+});
