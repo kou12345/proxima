@@ -5,32 +5,38 @@ type ChatHistory = {
   parts: { text: string }[];
 }[];
 
-const chatHistory: ChatHistory = [
+export const chatHistory: ChatHistory = [
   {
     role: "user",
-    parts: [{
-      text:
-        "プログラミングのプロフェッショナルの観点から、このコードについてご意見をお聞かせください。",
-    }],
+    parts: [
+      {
+        text: "プログラミングのプロフェッショナルの観点から、このコードについてご意見をお聞かせください。",
+      },
+    ],
   },
   {
     role: "model",
-    parts: [{
-      text:
-        "私はプログラミングのプロフェッショナルとして、コードレビューをします。",
-    }],
+    parts: [
+      {
+        text: "私はプログラミングのプロフェッショナルとして、コードレビューをします。",
+      },
+    ],
   },
   {
     role: "user",
-    parts: [{
-      text: "コードの可読性、変数名の適切さを評価して下さい。",
-    }],
+    parts: [
+      {
+        text: "コードの可読性、変数名の適切さを評価して下さい。",
+      },
+    ],
   },
   {
     role: "model",
-    parts: [{
-      text: "コードの可読性、変数名の適切さを評価します。",
-    }],
+    parts: [
+      {
+        text: "コードの可読性、変数名の適切さを評価します。",
+      },
+    ],
   },
 ];
 
