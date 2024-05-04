@@ -78,11 +78,30 @@ const SupplementaryCodeFormDialog = () => {
     name: "supplementaryCode",
   });
 
-  const onSubmit = (data: z.infer<typeof SupplementaryCodeFormSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof SupplementaryCodeFormSchema>,
+  ) => {
     console.log("submit!!!!");
     console.log(data);
 
     // TODO APIを叩く
+    const res = await fetch("/api/supplementary-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      console.error("error");
+      return;
+    }
+
+    // TODO LoadingUI
+
+    // 成功したらダイアログを閉じる
+    form.reset();
   };
   return (
     <Dialog>

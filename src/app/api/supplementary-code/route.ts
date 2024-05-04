@@ -1,3 +1,5 @@
+import { MAX_INPUT_TOKENS, model } from "@/server/gemini";
+import { chatHistory } from "@/server/gemini/chat";
 import { SupplementaryCodeFormSchema } from "@/server/type/zodSchema";
 import { createClient } from "@/utils/supabase/server";
 
@@ -21,5 +23,40 @@ export async function POST(request: Request) {
   }
   console.log("validated request: ", validation.data);
 
+  // token数を確認する
+  validation.data.supplementaryCode.forEach(async (supplementaryCode) => {
+    const prompt =
+      supplementaryCode.codeDescription +
+      "\n```\n" +
+      supplementaryCode.code +
+      "```\n";
+    const { totalTokens } = await model.countTokens(prompt);
+
+    if (MAX_INPUT_TOKENS <= totalTokens) {
+      return Response.json(
+        { error: "The number of tokens exceeds the limit" },
+        { status: 400 },
+      );
+    }
+  });
+
   // TODO historyに追加する
+  validation.data.supplementaryCode.forEach((supplementaryCode) => {
+    chatHistory.push({
+      role: "user",
+      parts: [
+        {
+          text:
+            supplementaryCode.codeDescription +
+            "\n```\n" +
+            supplementaryCode.code +
+            "```\n",
+        },
+      ],
+    });
+  });
+
+  console.log("chatHistory: ", chatHistory);
+
+  return Response.json({ response: "success" });
 }
