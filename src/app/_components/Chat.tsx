@@ -1,14 +1,35 @@
 "use client";
 
-import { useState, ClassAttributes, HTMLAttributes } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  ChatRequestSchema,
+  SupplementaryCodeFormSchema,
+} from "@/server/type/zodSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ClassAttributes, HTMLAttributes, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import ReactMarkdown, { ExtraProps } from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { ChatRequestSchema } from "@/server/type/zodSchema";
-import { useBoolean } from "../../hooks/useBoolean";
-import { CustomModal } from "./Modal";
-import { Button, FormControl, Input, Paper, Stack } from "@mui/material";
+import remarkGfm from "remark-gfm";
+import { z } from "zod";
+import { CustomTextarea } from "./CustomTextarea";
+import { Card, CardContent } from "@/components/ui/card";
 
 type CustomCodeProps = ClassAttributes<HTMLElement> &
   HTMLAttributes<HTMLElement> &
@@ -39,40 +60,144 @@ const CustomCode = ({ className, children }: CustomCodeProps) => {
   );
 };
 
+const SupplementaryCodeFormDialog = () => {
+  const form = useForm<z.infer<typeof SupplementaryCodeFormSchema>>({
+    resolver: zodResolver(SupplementaryCodeFormSchema),
+    defaultValues: {
+      supplementaryCode: [
+        {
+          codeDescription: "",
+          code: "",
+        },
+      ],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "supplementaryCode",
+  });
+
+  const onSubmit = (data: z.infer<typeof SupplementaryCodeFormSchema>) => {
+    console.log("submit!!!!");
+    console.log(data);
+
+    // TODO APIを叩く
+  };
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline" className="mr-2">
+          関連ファイルの追加
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[800px] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>関連ファイル</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {fields.map((field, idx) => (
+              <div key={field.id} className="space-y-4">
+                <div>
+                  <label htmlFor={`supplementaryCode[${idx}].codeDescription`}>
+                    コードの概要
+                  </label>
+                  <CustomTextarea
+                    name={`supplementaryCode[${idx}].codeDescription`}
+                    placeholder="コードの目的や概要を入力してください"
+                    setValue={(value) => {
+                      form.setValue(
+                        `supplementaryCode.${idx}.codeDescription`,
+                        value,
+                      );
+                    }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`supplementaryCode[${idx}].code`}>
+                    コード
+                  </label>
+                  <CustomTextarea
+                    name={`supplementaryCode[${idx}].code`}
+                    placeholder="conosle.log('Hello, World!');"
+                    setValue={(value) => {
+                      form.setValue(`supplementaryCode.${idx}.code`, value);
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => remove(idx)}
+                >
+                  削除
+                </Button>
+              </div>
+            ))}
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                onClick={() => append({ codeDescription: "", code: "" })}
+              >
+                追加
+              </Button>
+              <Button type="submit">保存</Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+type History = {
+  role: string;
+  text: string;
+};
+
+const ChatHistory = ({ histories }: { histories: History[] }) => {
+  return (
+    <div className="flex-grow overflow-y-auto p-4">
+      {histories.map((message, idx) => (
+        <Card key={idx} className="my-4 py-2">
+          <CardContent>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code: CustomCode,
+              }}
+            >
+              {message.text}
+            </ReactMarkdown>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
 export const Chat = () => {
-  const [codeDescription, setCodeDescription] = useState("");
-  const [code, setCode] = useState("");
   const [isDisabled, setIsDisabled] = useState(false);
-  const [history, setHistory] = useState<{ role: string; text: string }[]>([]);
-  console.log(history);
+  const [histories, setHistories] = useState<History[]>([]);
 
-  const {
-    state: isModalOpen,
-    setToTrue: openModal,
-    setToFalse: closeModal,
-  } = useBoolean(false);
+  const form = useForm<z.infer<typeof ChatRequestSchema>>({
+    resolver: zodResolver(ChatRequestSchema),
+    defaultValues: {
+      codeDescription: "",
+      code: "",
+    },
+  });
 
-  const onSubmitChat = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: z.infer<typeof ChatRequestSchema>) => {
     setIsDisabled(true);
-
-    const validation = ChatRequestSchema.safeParse({
-      codeDescription,
-      code,
-    });
-
-    if (!validation.success) {
-      console.error(validation.error);
-      return;
-    }
 
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(validation.data),
+      body: JSON.stringify(data),
     });
 
     if (!res.ok) {
@@ -82,97 +207,82 @@ export const Chat = () => {
 
     const json = await res.json();
 
-    setHistory((prevHistory) => [
-      ...prevHistory,
+    setHistories((prevHistories) => [
+      ...prevHistories,
       {
         role: "user",
-        text:
-          validation.data.codeDescription +
-          "\n```\n" +
-          validation.data.code +
-          "\n```\n",
+        text: data.codeDescription + "\n```\n" + data.code + "\n```\n",
       },
       { role: "model", text: json.response },
     ]);
 
-    setCode("");
     setIsDisabled(false);
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-grow overflow-y-auto p-4">
-        {history.map((message, index) => (
-          <div
-            key={index}
-            className={`mb-2 ${message.role === "user" ? "text-right" : ""}`}
-          >
-            <span
-              className={`${
-                message.role === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
-              } p-2 rounded-md inline-block`}
-            >
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  code: CustomCode,
-                }}
-              >
-                {message.text}
-              </ReactMarkdown>
-            </span>
-          </div>
-        ))}
+    <div className="flex h-screen">
+      <div className="w-1/2 overflow-y-auto">
+        <ChatHistory histories={histories} />
       </div>
-      <form onSubmit={onSubmitChat} className="p-4">
-        <Stack spacing={2}>
-          <Paper elevation={1} sx={{ padding: "12px" }}>
-            <Stack>
-              <FormControl required>
-                <label htmlFor="codeDescription">コードの概要</label>
-                <Input
-                  name="codeDescription"
-                  defaultValue={codeDescription}
-                  aria-label="Input field for code description"
-                  multiline
-                  placeholder="例: このコードは〇〇を実現するためのコードです。"
-                />
-              </FormControl>
-            </Stack>
-            <Stack>
-              <FormControl required>
-                <label htmlFor="code">コード</label>
-                <Input
-                  name="code"
-                  defaultValue={code}
-                  aria-label="Input field for code"
-                  multiline
-                  placeholder="console.log('Hello, World!');"
-                />
-              </FormControl>
-            </Stack>
-            <Stack
-              direction="row"
-              justifyContent="flex-end"
-              alignItems="center"
-              spacing={2}
-              sx={{
-                marginTop: "12px",
-              }}
-            >
-              <Button variant="outlined" onClick={openModal}>
-                関連ファイルを追加する
-              </Button>
-              <Button type="submit" variant="contained" disabled={isDisabled}>
-                送信
-              </Button>
-            </Stack>
-          </Paper>
-        </Stack>
-      </form>
-      <CustomModal isOpen={isModalOpen} onClose={closeModal} />
+      <div className="w-1/2 flex flex-col pt-4">
+        <div className="flex justify-end p-4">
+          <SupplementaryCodeFormDialog />
+          <Button
+            form="prompt"
+            type="submit"
+            variant="secondary"
+            disabled={isDisabled}
+          >
+            送信
+          </Button>
+        </div>
+        <Form {...form}>
+          <form
+            id="prompt"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 px-4"
+          >
+            <FormField
+              control={form.control}
+              name="codeDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="codeDescription">コードの概要</FormLabel>
+                  <FormControl>
+                    <CustomTextarea
+                      name="codeDescription"
+                      placeholder="コードの目的や概要を入力してください"
+                      setValue={(value) => {
+                        form.setValue("codeDescription", value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="code">コード</FormLabel>
+                  <FormControl>
+                    <CustomTextarea
+                      name={"code"}
+                      placeholder="conosle.log('Hello, World!');"
+                      setValue={(value) => {
+                        form.setValue("code", value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </div>
     </div>
   );
 };
