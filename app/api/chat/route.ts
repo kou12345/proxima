@@ -3,6 +3,7 @@ import { ChatRequestSchema } from "@/server/type/zodSchema";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
+  console.log("POST /api/chat");
   // 認証チェック
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -10,15 +11,17 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const json = await request.json();
-  console.log(json);
-
-  const validation = ChatRequestSchema.safeParse(json);
+  // リクエストのバリデーション
+  const validation = ChatRequestSchema.safeParse(await request.json());
   if (!validation.success) {
     return Response.json({ error: validation.error }, { status: 400 });
   }
+  console.log("validated request: ", validation.data);
 
-  const res = await chatGemini(validation.data.prompt);
+  const prompt = validation.data.codeDescription + "\n```" +
+    validation.data.code + "```";
+
+  const res = await chatGemini(prompt);
 
   return Response.json({ response: res });
 }
