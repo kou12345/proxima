@@ -18,5 +18,6 @@ export const loginSchema = z.object({
 });
 
 export const ChatRequestSchema = z.object({
-  prompt: z.string().min(1),
+  codeDescription: z.string().min(1),
+  code: z.string().min(1),
 });
