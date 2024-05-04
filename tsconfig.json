@@ -19,10 +19,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/server/*": ["./server/*"],
-      "@/utils/*": ["./utils/*"],
+      "@/server/*": ["./src/server/*"],
+      "@/utils/*": ["./src/utils/*"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "server/translation/index.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/server/translation/index.js"],
   "exclude": ["node_modules", "supabase"]
 }
