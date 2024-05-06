@@ -30,7 +30,13 @@ const functionDeclaration: FunctionDeclaration = {
 
 export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export const model = genAI.getGenerativeModel({
-  model: "gemini-pro",
+  model: "gemini-1.5-pro-latest",
+  generationConfig: {
+    maxOutputTokens: 2048,
+    temperature: 0.1,
+    topK: 40,
+    topP: 0.95,
+  },
   // TODO これが原因でエラーが出ているかも
   // tools: [{
   //   functionDeclarations: [functionDeclaration],

@@ -1,9 +1,9 @@
 import { chatGemini } from "@/server/gemini/chat";
-import { ChatRequestSchema } from "@/server/type/zodSchema";
+import { CodeReviewSchema } from "@/server/type/zodSchema";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
-  console.log("POST /api/chat");
+  console.log("POST /api/code-review");
   // 認証チェック
   const supabase = await createClient();
   const {
@@ -14,13 +14,16 @@ export async function POST(request: Request) {
   }
 
   // リクエストのバリデーション
-  const validation = ChatRequestSchema.safeParse(await request.json());
+  const validation = CodeReviewSchema.safeParse(await request.json());
   if (!validation.success) {
     return Response.json({ error: validation.error }, { status: 400 });
   }
   console.log("validated request: ", validation.data);
 
-  const res = await chatGemini(validation.data.prompt);
+  const prompt =
+    validation.data.codeDescription + "\n```" + validation.data.code + "```";
+
+  const res = await chatGemini(prompt);
 
   return Response.json({ response: res });
 }
