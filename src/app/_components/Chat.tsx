@@ -17,11 +17,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  CodeReviewSchema,
   ChatRequestSchema,
   SupplementaryCodeFormSchema,
 } from "@/server/type/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClassAttributes, HTMLAttributes, useState } from "react";
+import {
+  ClassAttributes,
+  Dispatch,
+  HTMLAttributes,
+  SetStateAction,
+  useState,
+} from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import ReactMarkdown, { ExtraProps } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -125,7 +132,8 @@ const SupplementaryCodeFormDialog = () => {
                   <CustomTextarea
                     name={`supplementaryCode[${idx}].codeDescription`}
                     placeholder="コードの目的や概要を入力してください"
-                    setValue={(value) => {
+                    value={field.codeDescription}
+                    onChange={(value) => {
                       form.setValue(
                         `supplementaryCode.${idx}.codeDescription`,
                         value,
@@ -140,7 +148,8 @@ const SupplementaryCodeFormDialog = () => {
                   <CustomTextarea
                     name={`supplementaryCode[${idx}].code`}
                     placeholder="conosle.log('Hello, World!');"
-                    setValue={(value) => {
+                    value={field.code}
+                    onChange={(value) => {
                       form.setValue(`supplementaryCode.${idx}.code`, value);
                     }}
                   />
@@ -196,22 +205,98 @@ const ChatHistory = ({ histories }: { histories: History[] }) => {
   );
 };
 
+type PromptFormProps = {
+  setHistories: Dispatch<SetStateAction<History[]>>;
+};
+
+const PromptForm = ({ setHistories }: PromptFormProps) => {
+  const [isDisabled, setIsDisabled] = useState(false);
+  const form = useForm<z.infer<typeof ChatRequestSchema>>({
+    resolver: zodResolver(ChatRequestSchema),
+    defaultValues: {
+      prompt: "",
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof ChatRequestSchema>) => {
+    console.log("submit");
+    setIsDisabled(true);
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      console.error("error");
+      return;
+    }
+
+    const json = await res.json();
+
+    setHistories((prevHistories) => [
+      ...prevHistories,
+      {
+        role: "user",
+        text: data.prompt + "\n",
+      },
+      { role: "model", text: json.response },
+    ]);
+
+    form.reset();
+    setIsDisabled(false);
+  };
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-4">
+        <FormField
+          control={form.control}
+          name="prompt"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="prompt">プロンプト</FormLabel>
+              <FormControl>
+                <CustomTextarea
+                  name="prompt"
+                  placeholder="prompt"
+                  value={field.value}
+                  onChange={(value) => {
+                    field.onChange(value);
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={isDisabled}>
+          送信
+        </Button>
+      </form>
+    </Form>
+  );
+};
+
 export const Chat = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [histories, setHistories] = useState<History[]>([]);
+  console.log("histories: ", histories);
 
-  const form = useForm<z.infer<typeof ChatRequestSchema>>({
-    resolver: zodResolver(ChatRequestSchema),
+  const form = useForm<z.infer<typeof CodeReviewSchema>>({
+    resolver: zodResolver(CodeReviewSchema),
     defaultValues: {
       codeDescription: "",
       code: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof ChatRequestSchema>) => {
+  const onSubmit = async (data: z.infer<typeof CodeReviewSchema>) => {
     setIsDisabled(true);
 
-    const res = await fetch("/api/chat", {
+    const res = await fetch("/api/code-review", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -235,11 +320,12 @@ export const Chat = () => {
       { role: "model", text: json.response },
     ]);
 
+    form.reset();
     setIsDisabled(false);
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <div className="w-1/2 overflow-y-auto">
         <ChatHistory histories={histories} />
       </div>
@@ -271,8 +357,9 @@ export const Chat = () => {
                     <CustomTextarea
                       name="codeDescription"
                       placeholder="コードの目的や概要を入力してください"
-                      setValue={(value) => {
-                        form.setValue("codeDescription", value);
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value);
                       }}
                     />
                   </FormControl>
@@ -290,8 +377,9 @@ export const Chat = () => {
                     <CustomTextarea
                       name={"code"}
                       placeholder="conosle.log('Hello, World!');"
-                      setValue={(value) => {
-                        form.setValue("code", value);
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value);
                       }}
                     />
                   </FormControl>
@@ -301,6 +389,8 @@ export const Chat = () => {
             />
           </form>
         </Form>
+
+        <PromptForm setHistories={setHistories} />
       </div>
     </div>
   );

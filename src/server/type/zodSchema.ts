@@ -17,11 +17,15 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-export const ChatRequestSchema = z.object({
+export const CodeReviewSchema = z.object({
   codeDescription: z.string().min(1),
   code: z.string().min(1),
 });
 
 export const SupplementaryCodeFormSchema = z.object({
-  supplementaryCode: z.array(ChatRequestSchema),
+  supplementaryCode: z.array(CodeReviewSchema),
+});
+
+export const ChatRequestSchema = z.object({
+  prompt: z.string().min(1),
 });
