@@ -18,7 +18,9 @@ export default async function MemosPage() {
         {tree.map((item, i) => {
           return (
             <li key={i}>
-              <Link href={`/tasks/memos/${item.path}`}>{item.path}</Link>
+              <Link href={`/tasks/memos/${encodeURIComponent(item.path)}`}>
+                {item.path}
+              </Link>
             </li>
           );
         })}
