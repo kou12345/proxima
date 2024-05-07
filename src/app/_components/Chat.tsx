@@ -16,56 +16,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  CodeReviewSchema,
   ChatRequestSchema,
+  CodeReviewSchema,
   SupplementaryCodeFormSchema,
-} from "@/server/type/zodSchema";
+} from "@/server/type/chat/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ClassAttributes,
-  Dispatch,
-  HTMLAttributes,
-  SetStateAction,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import ReactMarkdown, { ExtraProps } from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import remarkGfm from "remark-gfm";
 import { z } from "zod";
 import { CustomTextarea } from "./CustomTextarea";
-import { Card, CardContent } from "@/components/ui/card";
-
-type CustomCodeProps = ClassAttributes<HTMLElement> &
-  HTMLAttributes<HTMLElement> &
-  ExtraProps;
-
-const CustomCode = ({ className, children }: CustomCodeProps) => {
-  const match = /language-(\w+)/.exec(className || "");
-
-  // インラインコードの表示
-  if (!className && typeof children === "string" && !children.includes("\n")) {
-    return (
-      <code className="bg-gray-800 text-white px-1 mx-1 rounded">
-        {children}
-      </code>
-    );
-  }
-
-  return match ? (
-    // 言語指定のあるcode block
-    <SyntaxHighlighter style={atomDark} language={match[1]} PreTag="pre">
-      {String(children).replace(/\n$/, "")}
-    </SyntaxHighlighter>
-  ) : (
-    // 言語指定なしのcode block
-    <SyntaxHighlighter style={atomDark} PreTag="pre">
-      {String(children).replace(/\n$/, "")}
-    </SyntaxHighlighter>
-  );
-};
+import { Markdown } from "./Markdown";
 
 const SupplementaryCodeFormDialog = () => {
   const form = useForm<z.infer<typeof SupplementaryCodeFormSchema>>({
@@ -190,14 +153,7 @@ const ChatHistory = ({ histories }: { histories: History[] }) => {
       {histories.map((message, idx) => (
         <Card key={idx} className="my-4 py-2">
           <CardContent>
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code: CustomCode,
-              }}
-            >
-              {message.text}
-            </ReactMarkdown>
+            <Markdown text={message.text} />
           </CardContent>
         </Card>
       ))}
