@@ -4,6 +4,7 @@ import { ClassAttributes, HTMLAttributes } from "react";
 import ReactMarkdown, { ExtraProps } from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 type CustomCodeProps = ClassAttributes<HTMLElement> &
@@ -24,25 +25,33 @@ const CustomCode = ({ className, children }: CustomCodeProps) => {
 
   return match ? (
     // 言語指定のあるcode block
-    <SyntaxHighlighter
-      lineProps={{ style: { wordBreak: "break-all", whiteSpace: "pre-wrap" } }}
-      wrapLines={true}
-      style={atomDark}
-      language={match[1]}
-      PreTag="pre"
-    >
-      {String(children).replace(/\n$/, "")}
-    </SyntaxHighlighter>
+    <div className="text-xs">
+      <SyntaxHighlighter
+        lineProps={{
+          style: { wordBreak: "break-all", whiteSpace: "pre-wrap" },
+        }}
+        wrapLines={true}
+        style={atomDark}
+        language={match[1]}
+        PreTag="pre"
+      >
+        {String(children).replace(/\n$/, "")}
+      </SyntaxHighlighter>
+    </div>
   ) : (
     // 言語指定なしのcode block
-    <SyntaxHighlighter
-      lineProps={{ style: { wordBreak: "break-all", whiteSpace: "pre-wrap" } }}
-      wrapLines={true}
-      style={atomDark}
-      PreTag="pre"
-    >
-      {String(children).replace(/\n$/, "")}
-    </SyntaxHighlighter>
+    <div className="text-xs">
+      <SyntaxHighlighter
+        lineProps={{
+          style: { wordBreak: "break-all", whiteSpace: "pre-wrap" },
+        }}
+        wrapLines={true}
+        style={atomDark}
+        PreTag="pre"
+      >
+        {String(children).replace(/\n$/, "")}
+      </SyntaxHighlighter>
+    </div>
   );
 };
 
@@ -53,9 +62,10 @@ type MarkdownProps = {
 export const Markdown = ({ text }: MarkdownProps) => {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkBreaks]}
       components={{
         code: CustomCode,
+        p: ({ children }) => <p style={{ marginBottom: "1em" }}>{children}</p>,
       }}
     >
       {text}
