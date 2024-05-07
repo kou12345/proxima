@@ -1,6 +1,6 @@
 import { MAX_INPUT_TOKENS, model } from "@/server/gemini";
 import { chatHistory } from "@/server/gemini/chat";
-import { SupplementaryCodeFormSchema } from "@/server/type/zodSchema";
+import { SupplementaryCodeFormSchema } from "@/server/type/chat/zodSchema";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
