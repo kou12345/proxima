@@ -1,12 +1,9 @@
-import { getTree } from "@/server/github";
+import Link from "next/link";
 
 export default async function Page() {
-  const tree = await getTree();
-
   return (
     <div>
-      <h1>Repository Tree</h1>
-      <pre>{JSON.stringify(tree, null, 2)}</pre>
+      <Link href="/tasks/memos">Memos</Link>
     </div>
   );
 }
