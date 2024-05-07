@@ -1,6 +1,9 @@
 import { Markdown } from "@/app/_components/Markdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
 import { getContent } from "@/server/github";
+import { CustomNavigationMenu } from "./CustomNavigationMenu";
 
 const getPath = (path: string) => {
   if (path === decodeURIComponent(path)) {
@@ -19,6 +22,10 @@ export default async function MemoDetailPage({
 
   return (
     <div>
+      <div className="flex justify-end">
+        <CustomNavigationMenu />
+      </div>
+      <Separator className="my-4" />
       <Card>
         <CardHeader>
           <CardTitle>{path}</CardTitle>
