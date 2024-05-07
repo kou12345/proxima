@@ -1,17 +1,19 @@
 "use server";
 
-import { VectorSearchResponseSchema } from "../type/zodSchema";
+import { VectorSearchResponseSchema } from "../type/chat/zodSchema";
 
-export type State = {
-  success: true;
-  result: {
-    content: string;
-    similarity: number;
-  }[];
-} | {
-  success: false;
-  error: string;
-};
+export type State =
+  | {
+      success: true;
+      result: {
+        content: string;
+        similarity: number;
+      }[];
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 export const questionAction = async (
   _prevState: State,
@@ -25,7 +27,7 @@ export const questionAction = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization":
+        Authorization:
           "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
       },
       body: JSON.stringify({ query: question }),
