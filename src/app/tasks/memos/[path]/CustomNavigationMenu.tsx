@@ -40,7 +40,7 @@ const ExtractTaskDialog = () => {
       return;
     }
 
-    setExtractedText(parsedData.text);
+    setExtractedText(parsedData.data.text);
   };
 
   return (
