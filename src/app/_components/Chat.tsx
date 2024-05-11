@@ -110,7 +110,7 @@ const SupplementaryCodeFormDialog = () => {
                   </label>
                   <CustomTextarea
                     name={`supplementaryCode[${idx}].code`}
-                    placeholder="conosle.log('Hello, World!');"
+                    placeholder="console.log('Hello, World!');"
                     value={field.code}
                     onChange={(value) => {
                       form.setValue(`supplementaryCode.${idx}.code`, value);
@@ -332,7 +332,7 @@ export const Chat = () => {
                   <FormControl>
                     <CustomTextarea
                       name={"code"}
-                      placeholder="conosle.log('Hello, World!');"
+                      placeholder="console.log('Hello, World!');"
                       value={field.value}
                       onChange={(value) => {
                         field.onChange(value);
