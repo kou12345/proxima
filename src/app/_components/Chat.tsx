@@ -49,7 +49,7 @@ const SupplementaryCodeFormDialog = () => {
   });
 
   const onSubmit = async (
-    data: z.infer<typeof SupplementaryCodeFormSchema>,
+    data: z.infer<typeof SupplementaryCodeFormSchema>
   ) => {
     console.log("submit!!!!");
     console.log(data);
@@ -99,7 +99,7 @@ const SupplementaryCodeFormDialog = () => {
                     onChange={(value) => {
                       form.setValue(
                         `supplementaryCode.${idx}.codeDescription`,
-                        value,
+                        value
                       );
                     }}
                   />
