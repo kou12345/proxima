@@ -26,9 +26,7 @@ const regexRenderer = createRegexRenderer([
   ],
 ]);
 
-export const Textarea = (
-  props: Omit<RichTextareaProps, "children" | "ref">
-) => {
+const Textarea = (props: Omit<RichTextareaProps, "children" | "ref">) => {
   return (
     <RichTextarea
       {...props}
