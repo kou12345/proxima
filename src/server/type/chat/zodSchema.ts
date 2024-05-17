@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Database } from "./database.types";
+import { Database } from "../database.types";
 
 type MatchDocumentsDot =
   Database["public"]["Functions"]["match_documents_dot"]["Returns"];

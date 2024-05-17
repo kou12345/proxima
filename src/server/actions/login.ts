@@ -1,16 +1,18 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { loginSchema } from "../type/zodSchema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { loginSchema } from "../type/chat/zodSchema";
 
-export type State = {
-  success: true;
-} | {
-  success: false;
-  error: string;
-};
+export type State =
+  | {
+      success: true;
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 export const login = async (
   _prevState: State,

@@ -1,5 +1,5 @@
 import { chatGemini } from "@/server/gemini/chat";
-import { CodeReviewSchema } from "@/server/type/zodSchema";
+import { CodeReviewSchema } from "@/server/type/chat/zodSchema";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
