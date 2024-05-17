@@ -1,30 +1,54 @@
-import { getTree } from "@/server/github";
+"use client";
+
 import Link from "next/link";
+import {
+  RichTextarea,
+  RichTextareaProps,
+  createRegexRenderer,
+} from "rich-textarea";
 
-export default async function MemosPage() {
-  const tree = await getTree();
-  if (!tree) {
-    return (
-      <div>
-        <p>file not found</p>
-      </div>
-    );
-  }
+const regexRenderer = createRegexRenderer([
+  [
+    /\[([^\]]+)\]/g,
+    ({ children, key, value }) => {
+      const linkValue = value.slice(1, -1);
+      return (
+        <Link
+          key={key}
+          href={`/tasks/memos/${linkValue}`}
+          target="_blank"
+          className="text-green-400"
+        >
+          {children}
+        </Link>
+      );
+    },
+  ],
+]);
 
+export const Textarea = (
+  props: Omit<RichTextareaProps, "children" | "ref">
+) => {
+  return (
+    <RichTextarea
+      {...props}
+      style={{
+        width: "100%",
+        height: "300px",
+        border: "none",
+        outline: "none",
+        resize: "none",
+      }}
+    >
+      {regexRenderer}
+    </RichTextarea>
+  );
+};
+
+export default function MemosPage() {
   return (
     <div>
-      <h1>Repository Tree</h1>
-      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-        {tree.map((item, i) => {
-          return (
-            <li key={i}>
-              <Link href={`/tasks/memos/${encodeURIComponent(item.path)}`}>
-                {item.path}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <Textarea defaultValue="Lorem ipsum" name="hello" />
     </div>
   );
 }
