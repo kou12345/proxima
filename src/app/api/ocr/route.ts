@@ -1,4 +1,4 @@
-import { model, visionModel } from "@/server/gemini";
+import { model } from "@/server/gemini";
 
 export async function POST(request: Request) {
   const json = await request.json();
