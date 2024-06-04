@@ -1,6 +1,7 @@
 "use client";
 
 import { updateMemoTitle } from "@/server/actions/memo";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export const TitleInput = ({ id, initialTitle }: Props) => {
+  const router = useRouter();
   const [inputTitle, setInputTitle] = useState(
     initialTitle === "Untitled" ? "" : initialTitle,
   );
@@ -28,6 +30,12 @@ export const TitleInput = ({ id, initialTitle }: Props) => {
         console.log("update content");
         await updateMemoTitle(id, newTitle);
         prevContentRef.current = newTitle;
+
+        console.log("newTitle : ", newTitle);
+
+        // 再リロードをせずにURLを更新
+        const newUrl = `/memos/${encodeURIComponent(newTitle)}`;
+        window.history.pushState(null, "", newUrl);
       }, 500);
     }
   };
