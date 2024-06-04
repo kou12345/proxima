@@ -1,7 +1,6 @@
 "use client";
 
 import { updateMemoTitle } from "@/server/actions/memo";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 type Props = {
@@ -10,7 +9,6 @@ type Props = {
 };
 
 export const TitleInput = ({ id, initialTitle }: Props) => {
-  const router = useRouter();
   const [inputTitle, setInputTitle] = useState(
     initialTitle === "Untitled" ? "" : initialTitle,
   );
