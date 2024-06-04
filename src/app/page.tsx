@@ -7,7 +7,7 @@ export default function Home() {
         <Link href="/chat">Chat</Link>
       </p>
       <p>
-        <Link href="/tasks">Tasks</Link>
+        <Link href="/memos">Memos</Link>
       </p>
     </div>
   );
