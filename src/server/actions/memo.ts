@@ -46,20 +46,27 @@ export const createMemo = async () => {
   redirect(`/memos/${data[0].id}`);
 };
 
-export const getMemo = async (id: string) => {
+export const getMemoByTitle = async (title: string) => {
+  console.log("getMemoByTitleの引数 : ", title);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     throw new Error("Unauthorized");
   }
 
-  const { data, error } = await supabase.from("memos").select("title, content")
+  const { data, error } = await supabase.from("memos").select(
+    "id, title, content",
+  )
     .eq(
-      "id",
-      id,
+      "title",
+      title,
     );
   if (error) {
     throw error;
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error("Not found");
   }
 
   return data[0];
@@ -73,6 +80,19 @@ export const updateMemoTitle = async (id: string, title: string) => {
     throw new Error("Unauthorized");
   }
 
+  if (title === "") {
+    title = "Untitled";
+  }
+  // すでに同じtitleが存在する場合はエラー
+  const { data: { count } } = await supabase.from("memos").select("count(*)")
+    .eq(
+      "title",
+      title,
+    );
+  if (count > 0 && title === "Untitled") {
+    // Untitledに_数字をつける
+  }
+
   const { error } = await supabase.from("memos").update({ title }).eq(
     "id",
     id,
@@ -81,7 +101,7 @@ export const updateMemoTitle = async (id: string, title: string) => {
     throw error;
   }
 
-  revalidateTag(`/memos/${id}`);
+  // revalidateTag(`/memos/${id}`);
 };
 
 export const updateMemoContent = async (id: string, content: string) => {
