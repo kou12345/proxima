@@ -9,6 +9,9 @@ export default function Home() {
       <p>
         <Link href="/memos">Memos</Link>
       </p>
+      <p>
+        <Link href="/ocr">OCR</Link>
+      </p>
     </div>
   );
 }
