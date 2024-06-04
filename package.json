@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "copy-cmaps": "cp -r node_modules/pdfjs-dist/cmaps/ public/cmaps/"
+    "copy-cmaps": "cp -r node_modules/pdfjs-dist/cmaps/ public/cmaps/",
+    "sql": "drizzle-kit generate",
+    "drop": "drizzle-kit drop",
+    "pull": "drizzle-kit introspect"
   },
   "dependencies": {
     "@google/generative-ai": "^0.8.0",
@@ -22,11 +25,13 @@
     "@xenova/transformers": "^2.17.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.31.0",
     "lucide-react": "^0.378.0",
     "next": "14.2.2",
     "next-themes": "^0.3.0",
     "octokit": "^3.2.1",
     "pdfjs-dist": "^4.3.136",
+    "postgres": "^3.4.4",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "react": "^18",
     "react-dom": "^18",
@@ -45,6 +50,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.11",
+    "drizzle-kit": "^0.22.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.2",
     "postcss": "^8",
