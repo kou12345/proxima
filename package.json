@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "copy-cmaps": "cp -r node_modules/pdfjs-dist/cmaps/ public/cmaps/"
   },
   "dependencies": {
     "@google/generative-ai": "^0.8.0",
