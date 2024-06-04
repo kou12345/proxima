@@ -6,11 +6,11 @@ import Image from "next/image";
 
 // TODO 画像でもOCRをする
 
-const convertPDFToBase64Images = async (file: File): Promise<string[]> => {
+const convertPDFToBase64Images = async (file: File) => {
   const arrayBuffer = await file.arrayBuffer();
   const loadingTask = pdfjs.getDocument({
     data: arrayBuffer,
-    cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+    cMapUrl: "/cmaps/",
     cMapPacked: true,
   });
   const pdf = await loadingTask.promise;
