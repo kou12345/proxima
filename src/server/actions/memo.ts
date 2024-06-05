@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { db } from "../db";
 import { memos } from "@/schema/memos";
 import { desc, eq, sql } from "drizzle-orm";
+import { memoContents } from "@/schema/memoContents";
 
 export const getMemos = async () => {
   const supabase = await createClient();
@@ -16,13 +17,12 @@ export const getMemos = async () => {
   const res = await db.select({
     id: memos.id,
     title: memos.title,
-    content: memos.content,
   }).from(memos).where(eq(memos.userId, user.id));
 
   return res;
 };
 
-export const getMemoByTitle = async (title: string) => {
+export const getMemoContentByTitle = async (title: string) => {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -42,15 +42,21 @@ export const getMemoByTitle = async (title: string) => {
     };
   }
 
+  // const result = await db.select().from(users).innerJoin(pets, eq(users.id, pets.ownerId))
   const memo = await db.select({
     id: memos.id,
     title: memos.title,
-    content: memos.content,
-  }).from(memos).where(eq(memos.title, title));
+    content: memoContents.content,
+  }).from(memos).where(eq(memos.title, title)).innerJoin(
+    memoContents,
+    eq(memos.id, memoContents.memoId),
+  );
 
   if (memo.length === 0) {
     throw new Error("Not found");
   }
+
+  console.log("memo : ", memo);
 
   return memo[0];
 };

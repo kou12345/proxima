@@ -1,14 +1,14 @@
 import { Separator } from "@/components/ui/separator";
 import { TitleInput } from "./TitleInput";
 import { ContentInput } from "./ContentInput";
-import { getMemoByTitle } from "@/server/actions/memo";
+import { getMemoContentByTitle } from "@/server/actions/memo";
 
 export default async function MemoDetailPage({
   params,
 }: {
   params: { title: string };
 }) {
-  const memo = await getMemoByTitle(decodeURIComponent(params.title));
+  const memo = await getMemoContentByTitle(decodeURIComponent(params.title));
 
   return (
     <div>
