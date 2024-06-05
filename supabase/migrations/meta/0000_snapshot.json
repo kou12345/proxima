@@ -1,11 +1,11 @@
 {
-  "id": "ec80fef7-e0b9-4c0b-8acb-70af194a97fd",
+  "id": "933fe286-4151-43e5-bb06-280d2503ff8c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.memos": {
-      "name": "memos",
+    "public.memo_contents": {
+      "name": "memo_contents",
       "schema": "",
       "columns": {
         "id": {
@@ -15,18 +15,17 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "memo_id": {
+          "name": "memo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''Untitled''"
         },
         "content": {
           "name": "content",
@@ -50,17 +49,67 @@
         }
       },
       "indexes": {},
+      "foreignKeys": {
+        "memo_contents_memo_id_memos_id_fk": {
+          "name": "memo_contents_memo_id_memos_id_fk",
+          "tableFrom": "memo_contents",
+          "tableTo": "memos",
+          "columnsFrom": [
+            "memo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.memos": {
+      "name": "memos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Untitled'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "memos_user_id_unique": {
-          "name": "memos_user_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     }
   },
   "enums": {},
