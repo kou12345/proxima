@@ -1,19 +1,20 @@
 import { Separator } from "@/components/ui/separator";
 import { TitleInput } from "./TitleInput";
 import { ContentInput } from "./ContentInput";
-import { getMemo } from "@/server/actions/memo";
+import { getMemoByTitle } from "@/server/actions/memo";
 
 export default async function MemoDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: { title: string };
 }) {
-  const memo = await getMemo(params.id);
+  const memo = await getMemoByTitle(decodeURIComponent(params.title));
+
   return (
     <div>
-      <TitleInput id={params.id} initialTitle={memo.title || ""} />
+      <TitleInput id={memo.id} initialTitle={memo.title} />
       <Separator className="my-2" />
-      <ContentInput id={params.id} initialContent={memo.content || ""} />
+      <ContentInput id={memo.id} initialContent={memo.content || ""} />
     </div>
   );
 }

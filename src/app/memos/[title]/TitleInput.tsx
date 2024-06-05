@@ -28,6 +28,12 @@ export const TitleInput = ({ id, initialTitle }: Props) => {
         console.log("update content");
         await updateMemoTitle(id, newTitle);
         prevContentRef.current = newTitle;
+
+        console.log("newTitle : ", newTitle);
+
+        // 再リロードをせずにURLを更新
+        const newUrl = `/memos/${encodeURIComponent(newTitle)}`;
+        window.history.pushState(null, "", newUrl);
       }, 500);
     }
   };

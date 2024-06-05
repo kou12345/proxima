@@ -1,21 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { createMemo } from "@/server/actions/memo";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export const NewMemoButton = () => {
-  // TODO Buttonを押したら、ボタンにローディングアイコンを表示する
-  const [isLoaded, setIsLoaded] = useState(false);
+  const router = useRouter();
   const onClickNewMemo = async () => {
-    setIsLoaded(true);
-    await createMemo();
-    setIsLoaded(false);
+    router.push("/memos/new");
   };
 
-  return (
-    <Button onClick={onClickNewMemo} disabled={isLoaded}>
-      new memo
-    </Button>
-  );
+  return <Button onClick={onClickNewMemo}>new memo</Button>;
 };

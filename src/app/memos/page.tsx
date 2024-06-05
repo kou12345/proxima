@@ -14,7 +14,9 @@ export default async function MemosPage() {
           <Card key={memo.id} className="h-40">
             <CardHeader>
               <CardTitle className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-                <Link href={`/memos/${memo.id}`}>{memo.title}</Link>
+                <Link href={`/memos/${encodeURIComponent(memo.title)}`}>
+                  {memo.title}
+                </Link>
               </CardTitle>
             </CardHeader>
             <CardContent>
