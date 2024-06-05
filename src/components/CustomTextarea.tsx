@@ -7,6 +7,7 @@ import {
   createRegexRenderer,
 } from "rich-textarea";
 
+// [link] => <Link href="/tasks/memos/link">link</Link>
 const regexRenderer = createRegexRenderer([
   [
     /\[([^\]]+)\]/g,
@@ -21,6 +22,17 @@ const regexRenderer = createRegexRenderer([
         >
           {children}
         </Link>
+      );
+    },
+  ],
+  [
+    /```([^`]+)```/g,
+    ({ key, value }) => {
+      const codeValue = value.slice(3, -3);
+      return (
+        <code key={key} className="bg-gray-200 p-1">
+          {codeValue}
+        </code>
       );
     },
   ],
