@@ -1,5 +1,6 @@
 "use client";
 
+import { H1 } from "@/components/Typography/H1";
 import dynamic from "next/dynamic";
 
 // Note: pdfjs-dist is not compatible with SSR
@@ -12,7 +13,7 @@ const ConvertPDFToImageWithNoSSR = dynamic(
 export default function OCRPage() {
   return (
     <div>
-      <h1>OCR</h1>
+      <H1>OCR</H1>
 
       <ConvertPDFToImageWithNoSSR />
     </div>
