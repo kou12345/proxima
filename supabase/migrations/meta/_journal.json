@@ -8,6 +8,13 @@
       "when": 1717566282010,
       "tag": "0000_sudden_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1718166555465,
+      "tag": "0001_premium_fat_cobra",
+      "breakpoints": true
     }
   ]
 }
