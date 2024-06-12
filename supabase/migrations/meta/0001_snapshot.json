@@ -1,6 +1,6 @@
 {
-  "id": "933fe286-4151-43e5-bb06-280d2503ff8c",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "200cd7b5-e777-43bb-9af2-0a522db2d004",
+  "prevId": "933fe286-4151-43e5-bb06-280d2503ff8c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -31,20 +31,20 @@
           "name": "content",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -95,21 +95,29 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "memos_title_unique": {
+          "name": "memos_title_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "title"
+          ]
+        }
+      }
     }
   },
   "enums": {},
