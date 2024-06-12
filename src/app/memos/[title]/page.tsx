@@ -17,7 +17,11 @@ export default async function MemoDetailPage({
       <Separator className="my-2" />
 
       {memo.contents.map((content, i) => (
-        <PostCard key={i} content={content.content} />
+        <PostCard
+          key={i}
+          content={content.content}
+          createdAt={content.createdAt}
+        />
       ))}
       {/* 入力欄 */}
       <PostForm memoId={memo.id} />
