@@ -3,13 +3,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { db } from "../db";
 import { memos } from "@/schema/memos";
-import { eq, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { memoContents } from "@/schema/memoContents";
 import { revalidatePath } from "next/cache";
 import "server-only";
 
 export const getMemos = async () => {
-  console.log(new Date());
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -17,16 +16,26 @@ export const getMemos = async () => {
   }
 
   // TODO limit, pagination
-  const res = await db.select({
-    id: memos.id,
-    title: memos.title,
-    content: memoContents.content,
-  }).from(memos).where(eq(memos.userId, user.id)).leftJoin(
-    memoContents,
-    eq(memos.id, memoContents.memoId),
-  );
-
-  console.log(res);
+  const res = await db
+    .select({
+      id: memos.id,
+      title: memos.title,
+      content: memoContents.content,
+    })
+    .from(memos)
+    .where(eq(memos.userId, user.id))
+    .leftJoin(
+      memoContents,
+      eq(
+        memoContents.id,
+        db
+          .select({ id: memoContents.id })
+          .from(memoContents)
+          .where(eq(memoContents.memoId, memos.id))
+          .orderBy(desc(memoContents.createdAt))
+          .limit(1),
+      ),
+    );
 
   revalidatePath("/memos");
 
@@ -54,15 +63,13 @@ export const getMemoContentsByTitle = async (title: string) => {
     throw new Error("Not found");
   }
 
-  console.log("memo : ", memo);
-
   return {
     id: memo[0].id,
     title: memo[0].title,
     contents: memo.map((item) => (
       {
         content: item.content || "",
-        createdAt: item.createdAt,
+        createdAt: item.createdAt?.toISOString() || "",
       }
     )),
   };
@@ -139,21 +146,7 @@ export const updateMemoTitle = async (id: string, title: string) => {
   }
 
   await db.update(memos).set({ title }).where(eq(memos.id, id));
-
-  // revalidateTag(`/memos/${id}`);
 };
-
-// export const updateMemoContent = async (id: string, content: string) => {
-//   const supabase = await createClient();
-//   const { data: { user } } = await supabase.auth.getUser();
-//   if (!user) {
-//     throw new Error("Unauthorized");
-//   }
-
-//   await db.update(memos).set({ content }).where(eq(memos.id, id));
-
-//   // revalidateTag(`/memos/${id}`);
-// };
 
 export const createMemoContent = async (
   memoId: string,
