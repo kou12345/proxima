@@ -46,3 +46,7 @@ export const MAX_INPUT_TOKENS = 30720;
 // export const model = genAI.getGenerativeModel({
 //   model: "gemini-1.5-pro-latest",
 // });
+
+export const embeddingModel = genAI.getGenerativeModel({
+  model: "embedding-001",
+});
