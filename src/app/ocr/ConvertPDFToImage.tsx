@@ -1,19 +1,22 @@
 "use client";
 
 import * as pdfjs from "pdfjs-dist";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { H2 } from "@/components/Typography/H2";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { saveMetadataToOcrResults } from "@/server/actions/ocrResults";
 
 // TODO 画像でもOCRをする
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const convertPDFToBase64Images = async (file: File) => {
   const arrayBuffer = await file.arrayBuffer();
   const loadingTask = pdfjs.getDocument({
     data: arrayBuffer,
-    cMapUrl: "/cmaps/",
+    cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
     cMapPacked: true,
   });
   const pdf = await loadingTask.promise;
@@ -67,6 +70,8 @@ export const ConvertPDFToImage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [base64ImageList, setBase64ImageList] = useState<string[]>([]);
+  const [fileName, setFileName] = useState<string>("");
+  const [folderName, setFolderName] = useState<string>("");
 
   const onClickUploadPDF = async () => {
     if (fileInputRef.current) {
@@ -80,6 +85,8 @@ export const ConvertPDFToImage = () => {
     const file = event.target.files?.[0];
     if (file) {
       setIsLoading(true);
+      setFolderName(new Date().toISOString());
+      setFileName(file.name);
 
       try {
         // PDFを画像にする
@@ -104,14 +111,15 @@ export const ConvertPDFToImage = () => {
     const files = convertBase64ImagesToFiles(base64ImageList);
 
     const uploadPromises = files.map(async (file) => {
-      const timestamp = new Date().toISOString();
-      const fileName = `${timestamp}_${file.name}`;
-
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from("ocr_results")
-        .upload(fileName, file, {
-          contentType: "image/jpeg",
-        });
+        .upload(
+          `${folderName}/${new Date().toISOString()}_${file.name}`,
+          file,
+          {
+            contentType: "image/jpeg",
+          },
+        );
 
       if (error) {
         console.error("Error uploading image");
@@ -122,6 +130,12 @@ export const ConvertPDFToImage = () => {
     try {
       await Promise.all(uploadPromises);
       console.log("All images uploaded successfully");
+
+      // fileNameとpdfから取得したfileNameをDBに保存する
+      await saveMetadataToOcrResults({
+        fileName,
+        storagePath: folderName,
+      });
     } catch (error) {
       console.error("Error uploading images:");
     } finally {
@@ -148,11 +162,6 @@ export const ConvertPDFToImage = () => {
     const json = await res.json();
     console.log(json);
   };
-
-  useEffect(() => {
-    pdfjs.GlobalWorkerOptions.workerSrc =
-      window.location.origin + "/pdf.worker.min.mjs";
-  }, []);
 
   return (
     <div>
