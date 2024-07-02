@@ -15,6 +15,20 @@
       "when": 1718166555465,
       "tag": "0001_premium_fat_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1718684419847,
+      "tag": "0002_thankful_runaways",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1719892874382,
+      "tag": "0003_aromatic_mauler",
+      "breakpoints": true
     }
   ]
 }
