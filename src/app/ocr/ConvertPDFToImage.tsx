@@ -2,7 +2,6 @@
 
 import * as pdfjs from "pdfjs-dist";
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { H2 } from "@/components/Typography/H2";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
@@ -13,6 +12,9 @@ import { saveMetadataToOcrResults } from "@/server/actions/ocrResults";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const convertPDFToBase64Images = async (file: File) => {
+  // pdfのテキスト
+  let pdfText = "";
+
   const arrayBuffer = await file.arrayBuffer();
   const loadingTask = pdfjs.getDocument({
     data: arrayBuffer,
@@ -22,28 +24,38 @@ const convertPDFToBase64Images = async (file: File) => {
   const pdf = await loadingTask.promise;
 
   const base64ImageList: string[] = [];
-  const canvas = document.createElement("canvas");
+  // const canvas = document.createElement("canvas");
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 3 });
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-    const renderContext = canvas.getContext("2d");
-    if (!renderContext) {
-      return [];
-    }
-    const renderTask = page.render({
-      canvasContext: renderContext,
-      viewport,
-    });
-    await renderTask.promise;
 
-    const base64Image = canvas.toDataURL("image/jpeg");
-    base64ImageList.push(base64Image.split(",")[1]);
+    const content = await page.getTextContent();
+    const pageText = content.items
+      .map((item) => ("str" in item ? item.str : ""))
+      .join("");
+    pdfText += pageText;
+
+    // const viewport = page.getViewport({ scale: 3 });
+    // canvas.height = viewport.height;
+    // canvas.width = viewport.width;
+    // const renderContext = canvas.getContext("2d");
+    // if (!renderContext) {
+    //   throw new Error("Failed to get canvas context");
+    // }
+    // const renderTask = page.render({
+    //   canvasContext: renderContext,
+    //   viewport,
+    // });
+    // await renderTask.promise;
+
+    // const base64Image = canvas.toDataURL("image/jpeg");
+    // base64ImageList.push(base64Image.split(",")[1]);
   }
 
-  return base64ImageList;
+  return {
+    base64ImageList,
+    pdfText,
+  };
 };
 
 const convertBase64ImagesToFiles = (base64ImageList: string[]) => {
@@ -72,6 +84,7 @@ export const ConvertPDFToImage = () => {
   const [base64ImageList, setBase64ImageList] = useState<string[]>([]);
   const [fileName, setFileName] = useState<string>("");
   const [folderName, setFolderName] = useState<string>("");
+  const [pdfText, setPdfText] = useState<string>("");
 
   const onClickUploadPDF = async () => {
     if (fileInputRef.current) {
@@ -90,7 +103,12 @@ export const ConvertPDFToImage = () => {
 
       try {
         // PDFを画像にする
-        setBase64ImageList(await convertPDFToBase64Images(file));
+        // setBase64ImageList(await convertPDFToBase64Images(file));
+        const { base64ImageList, pdfText } =
+          await convertPDFToBase64Images(file);
+        setBase64ImageList(base64ImageList);
+
+        setPdfText(pdfText);
       } catch (error) {
         console.error("Error converting PDF to images");
       }
@@ -203,7 +221,12 @@ export const ConvertPDFToImage = () => {
         </div>
       </div>
 
-      {base64ImageList.length > 0 && (
+      {pdfText && (
+        <div className="py-2">
+          <p>{pdfText}</p>
+        </div>
+      )}
+      {/* {base64ImageList.length > 0 && (
         <div className="image-list py-2">
           {base64ImageList.map((base64Image, index) => (
             <Image
@@ -215,7 +238,7 @@ export const ConvertPDFToImage = () => {
             />
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 };
