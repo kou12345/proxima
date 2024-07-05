@@ -2,11 +2,10 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { db } from "../db";
-import { memos } from "@/schema/memos";
 import { desc, eq, sql } from "drizzle-orm";
-import { memoContents } from "@/schema/memoContents";
 import { revalidatePath } from "next/cache";
 import "server-only";
+import { memoContents, memos } from "@/schema/schema";
 
 export const getMemos = async () => {
   const supabase = await createClient();
@@ -69,7 +68,7 @@ export const getMemoContentsByTitle = async (title: string) => {
     contents: memo.map((item) => (
       {
         content: item.content || "",
-        createdAt: item.createdAt?.toISOString() || "",
+        createdAt: item.createdAt?.toString() || "",
       }
     )),
   };
