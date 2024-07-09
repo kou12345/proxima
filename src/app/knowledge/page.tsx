@@ -1,11 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { usePdfToText } from "./usePdfToText";
+import { usePdfToText } from "./hooks/usePdfToText";
 import { ChangeEvent, FunctionComponent, RefObject } from "react";
-import { H2 } from "@/components/Typography/H2";
-import { P } from "@/components/Typography/P";
-import { EmbeddingButton } from "./EmbeddingButton";
+import { Input } from "@/components/ui/input";
+import { useSearch } from "./hooks/useSearch";
+
+// TODO ファイルアップロードボタンとembedボタンは一つのボタンにする
 
 const UploadPDFButton: FunctionComponent<{
   isLoading: boolean;
@@ -35,16 +36,21 @@ const UploadPDFButton: FunctionComponent<{
 };
 
 export default function Page() {
-  const {
-    pdfTextContents,
-    fileInputRef,
-    isLoading,
-    onClickUploadPDF,
-    handleFileUpload,
-  } = usePdfToText();
+  const { fileInputRef, isLoading, onClickUploadPDF, handleFileUpload } =
+    usePdfToText();
+  const { searchResults, handleSubmit } = useSearch();
 
   return (
-    <div className=" my-8 flex flex-col items-center">
+    <div className=" my-8 flex w-full flex-col items-center">
+      <form onSubmit={handleSubmit}>
+        <Input
+          type="text"
+          placeholder="Search"
+          id="search-text"
+          name="search-text"
+        />
+      </form>
+
       <UploadPDFButton
         isLoading={isLoading}
         fileInputRef={fileInputRef}
@@ -52,14 +58,7 @@ export default function Page() {
         onClickUploadPDF={onClickUploadPDF}
       />
 
-      <EmbeddingButton pdfTextContents={pdfTextContents} />
-
-      {pdfTextContents.map((pdfTextContent) => (
-        <div key={pdfTextContent.pageNumber} className="min-w-full text-left">
-          <H2>Page {pdfTextContent.pageNumber}</H2>
-          <P>{pdfTextContent.text}</P>
-        </div>
-      ))}
+      {searchResults}
     </div>
   );
 }
