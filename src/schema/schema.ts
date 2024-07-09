@@ -105,6 +105,13 @@ export const pages = pgTable("pages", {
   bookId: uuid("book_id").notNull().references(() => books.id),
   content: text("content").notNull(),
   pageNumber: integer("page_number").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+});
+
+export const embeddings = pgTable("embeddings", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  pageId: uuid("page_id").notNull().references(() => pages.id),
   embedding: vector("embedding", { dimensions: 768 }),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
