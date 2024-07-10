@@ -1,6 +1,5 @@
 import { searchAndFormat } from "@/server/actions/searchAndFormat";
 import { useState } from "react";
-import { set } from "zod";
 
 export const useSearch = () => {
   const [searchResults, setSearchResults] = useState("");
