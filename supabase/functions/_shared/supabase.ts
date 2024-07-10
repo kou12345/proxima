@@ -3,7 +3,7 @@ import { Database } from "./database.types.ts";
 
 export const supabase = createClient<Database>(
   // Supabase API URL - env var exported by default.
-  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("NEXT_PUBLIC_SUPABASE_URL")!,
   // Supabase API ANON KEY - env var exported by default.
-  Deno.env.get("SUPABASE_ANON_KEY")!,
+  Deno.env.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")!,
 );

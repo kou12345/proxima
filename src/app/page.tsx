@@ -10,7 +10,7 @@ export default function Home() {
         <Link href="/memos">Memos</Link>
       </p>
       <p>
-        <Link href="/ocr">OCR</Link>
+        <Link href="/knowledge">Knowledge</Link>
       </p>
     </div>
   );
