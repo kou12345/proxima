@@ -1,42 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { usePdfToText } from "./hooks/usePdfToText";
-import { ChangeEvent, FunctionComponent, RefObject } from "react";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "./hooks/useSearch";
-
-// TODO ファイルアップロードボタンとembedボタンは一つのボタンにする
-
-const UploadPDFButton: FunctionComponent<{
-  isLoading: boolean;
-  fileInputRef: RefObject<HTMLInputElement>;
-  handleFileUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
-  onClickUploadPDF: () => Promise<void>;
-}> = ({ isLoading, fileInputRef, handleFileUpload, onClickUploadPDF }) => {
-  return (
-    <>
-      <input
-        type="file"
-        accept=".pdf"
-        ref={fileInputRef}
-        style={{ display: "none" }}
-        onChange={handleFileUpload}
-      />
-
-      <Button
-        onClick={onClickUploadPDF}
-        className="mx-2 mb-4"
-        disabled={isLoading}
-      >
-        {isLoading ? "Loading..." : "Upload PDF"}
-      </Button>
-    </>
-  );
-};
+import { UploadPDFButton } from "./UploadPDFButton";
 
 export default function Page() {
-  const { fileInputRef, isLoading, onClickUploadPDF, handleFileUpload } =
+  const { isLoading, fileInputRef, handleFileUpload, onClickUploadPDF } =
     usePdfToText();
   const { searchResults, handleSubmit } = useSearch();
 
